@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-sensitive=yes">
+  <title>KaushalSetu | Local Workers Platform</title>
+  <style>
+    /* Reset & Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f7f4;
+      color: #1a3b2f;
+      line-height: 1.5;
+    }
+
+    /* Navigation */
+    .navbar {
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .logo h1 {
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, #0f5c4b, #2c9b7a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .logo p {
+      font-size: 0.8rem;
+      color: #5c8a7a;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: #2c5a4a;
+      font-weight: 500;
+      transition: 0.2s;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      background: #e0f0ea;
+      color: #0f5c4b;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: #e8f3ef;
+      padding: 0.3rem 1rem 0.3rem 0.8rem;
+      border-radius: 50px;
+    }
+    .user-avatar {
+      width: 35px;
+      height: 35px;
+      background: #2c9b7a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+    .logout-btn {
+      background: none;
+      border: 1px solid #bdd9cf;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .auth-btn {
+      background: #2c9b7a;
+      color: white !important;
+      padding: 0.5rem 1.2rem !important;
+    }
+    .auth-btn:hover {
+      background: #1f735a !important;
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 2rem;
+      min-height: 70vh;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #e6f4ef, #ffffff);
+      border-radius: 30px;
+      padding: 3rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .hero h2 {
+      font-size: 2.5rem;
+      color: #1a5a48;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      margin: 1rem 0;
+      color: #4a6b5f;
+    }
+
+    /* Workers Grid */
+    .section-title {
+      font-size: 1.8rem;
+      margin: 2rem 0 1.5rem;
+      color: #1a5a48;
+    }
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+    }
+    .filter-btn {
+      background: #e4f0eb;
+      border: none;
+      padding: 0.5rem 1.2rem;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background: #2c9b7a;
+      color: white;
+    }
+    .workers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.8rem;
+    }
+    .worker-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+    }
+    .worker-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .card-header {
+      background: #f5fbf8;
+      padding: 1.5rem;
+      text-align: center;
+      border-bottom: 1px solid #d4e8e0;
+    }
+    .worker-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+    .worker-name {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #1a5a48;
+    }
+    .profession-badge {
+      display: inline-block;
+      background: #d4e8e0;
+      padding: 0.2rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+    }
+    .card-body {
+      padding: 1.2rem;
+    }
+    .contact-info {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: #f9fdfb;
+      padding: 0.6rem;
+      border-radius: 40px;
+      margin-bottom: 0.8rem;
+      font-size: 0.9rem;
+    }
+    .book-btn {
+      width: 100%;
+      background: #2c9b7a;
+      color: white;
+      border: none;
+      padding: 0.7rem;
+      border-radius: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: 0.2s;
+    }
+    .book-btn:hover {
+      background: #1f735a;
+    }
+
+    /* Dashboard Panel */
+    .dashboard-panel {
+      background: linear-gradient(135deg, #ffffff, #f0f9f5);
+      border-radius: 25px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid #cde2d9;
+    }
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px dashed #cde2d9;
+    }
+    .info-cards {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .info-card {
+      background: #f5fbf8;
+      padding: 0.8rem 1.2rem;
+      border-radius: 20px;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      max-width: 450px;
+      width: 90%;
+      padding: 2rem;
+      border-radius: 30px;
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .toggle-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+    .toggle-btn {
+      background: none;
+      border: none;
+      padding: 0.5rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .toggle-btn.active {
+      border-bottom-color: #2c9b7a;
+      color: #2c9b7a;
+      font-weight: bold;
+    }
+    .form-group {
+      margin: 1rem 0;
+      text-align: left;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #cde2d9;
+      border-radius: 50px;
+      font-size: 1rem;
+    }
+    .submit-btn {
+      background: #2c9b7a;
+      color: white;
+      border: none;
+      padding: 0.8rem;
+      width: 100%;
+      border-radius: 50px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 1rem 0;
+    }
+    .close-modal {
+      background: none;
+      border: none;
+      color: #8aa7a0;
+      cursor: pointer;
+    }
+    .hidden-form {
+      display: none;
+    }
+
+    /* Success Popup */
+    .success-popup {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #2c9b7a;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      font-weight: bold;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      z-index: 1100;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      animation: slideIn 0.3s ease;
+      transition: opacity 0.3s;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Footer */
+    footer {
+      background: #0d3b30;
+      color: #b8d9ce;
+      text-align: center;
+      padding: 2rem;
+      margin-top: 3rem;
+    }
+
+    /* About & Contact Pages Styles */
+    .page-content {
+      background: white;
+      border-radius: 30px;
+      padding: 2rem;
+      margin-top: 1rem;
+    }
+    .contact-info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: #f5fbf8;
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="logo">
+      <h1>SkillConnect</h1>
+      <p>SkillConnect• Local Workers Hub</p>
+    </div>
+    <div class="nav-links" id="navLinks">
+    
+    </div>
+  </div>
+</nav>
+
+<main class="container" id="mainContent">
+  <!-- Dynamic page content will be loaded here -->
+</main>
+
+<footer>
+  <p>© 2026 skillconnect</p>
+</footer>
+
+<!-- Auth Modal -->
+<div id="authModal" class="modal">
+  <div class="modal-content">
+    <div class="toggle-group">
+      <button class="toggle-btn active" id="showLoginTab">Login</button>
+      <button class="toggle-btn" id="showRegisterTab">Register</button>
+    </div>
+    <!-- Login Form -->
+    <div id="loginFormDiv">
+      <div class="form-group"><input type="text" id="loginName" placeholder="Username"></div>
+      <div class="form-group"><input type="tel" id="loginMobile" placeholder="Mobile Number (10 digits)"></div>
+      <button class="submit-btn" id="doLogin">Login</button>
+    </div>
+    <!-- Register Form -->
+    <div id="registerFormDiv" class="hidden-form">
+      <div class="form-group"><input type="text" id="regName" placeholder="Full Name"></div>
+      <div class="form-group"><input type="tel" id="regMobile" placeholder="Mobile Number (10 digits)"></div>
+      <button class="submit-btn" id="doRegister">Register & Login</button>
+    </div>
+    <button class="close-modal" id="closeAuthModal">Cancel</button>
+  </div>
+</div>
+
+<!-- Success Popup Container -->
+<div id="successPopup" style="display: none;" class="success-popup">
+  <span>✅</span> <span id="popupMessage">Successfully Booked!</span>
+</div>
+
+<script>
+  // ---------- USER MANAGEMENT ----------
+  let currentUser = null;
+
+  function loadUser() {
+    const stored = localStorage.getItem('kaushal_user');
+    if (stored) {
+      try {
+        currentUser = JSON.parse(stored);
+        return true;
+      } catch(e) { return false; }
+    }
+    return false;
+  }
+
+  function saveUser(user) {
+    localStorage.setItem('kaushal_user', JSON.stringify(user));
+    currentUser = user;
+  }
+
+  function registerUser(name, mobile) {
+    if (!name.trim() || !mobile.trim()) {
+      showPopup("Please enter both name and mobile number", false);
+      return false;
+    }
+    if (!/^\d{10}$/.test(mobile)) {
+      showPopup("Mobile number must be exactly 10 digits", false);
+      return false;
+    }
+    const newUser = {
+      name: name.trim(),
+      mobile: mobile,
+      joined: new Date().toLocaleDateString('en-IN')
+    };
+    saveUser(newUser);
+    showPopup(`Welcome ${name}! Registration successful`, true);
+    return true;
+  }
+
+  function loginUser(name, mobile) {
+    const stored = localStorage.getItem('kaushal_user');
+    if (!stored) {
+      showPopup("No account found. Please register first.", false);
+      return false;
+    }
+    const user = JSON.parse(stored);
+    if (user.name.toLowerCase() === name.trim().toLowerCase() && user.mobile === mobile) {
+      currentUser = user;
+      saveUser(user);
+      showPopup(`Welcome back ${user.name}!`, true);
+      return true;
+    } else {
+      showPopup("Invalid credentials. Please try again.", false);
+      return false;
+    }
+  }
+
+  function logoutUser() {
+    localStorage.removeItem('kaushal_user');
+    currentUser = null;
+    showPopup("Logged out successfully!", true);
+    renderCurrentPage();
+  }
+
+  // ---------- SUCCESS POPUP FUNCTION (Booked Popup) ----------
+  function showPopup(message, isSuccess = true) {
+    const popup = document.getElementById('successPopup');
+    const popupMsg = document.getElementById('popupMessage');
+    popupMsg.innerHTML = isSuccess ? `✅ ${message}` : `⚠️ ${message}`;
+    popup.style.display = 'flex';
+    popup.style.background = isSuccess ? '#2c9b7a' : '#e67e22';
+    setTimeout(() => {
+      popup.style.opacity = '0';
+      setTimeout(() => {
+        popup.style.display = 'none';
+        popup.style.opacity = '1';
+      }, 300);
+    }, 2500);
+  }
+
+  // Booking Function
+  function bookWorker(workerName, workerProf, workerContact) {
+    if (!currentUser) {
+      showPopup("Please login/register to book a worker", false);
+      openAuthModal();
+      return;
+    }
+    // Show success popup as requested
+    showPopup(`Successfully Booked ${workerName} (${workerProf})! Call ${workerContact} for service.`, true);
+    // Optional: store booking in localStorage for history
+    const bookings = JSON.parse(localStorage.getItem('user_bookings') || '[]');
+    bookings.push({
+      workerName,
+      profession: workerProf,
+      contact: workerContact,
+      bookedBy: currentUser.name,
+      date: new Date().toLocaleString()
+    });
+    localStorage.setItem('user_bookings', JSON.stringify(bookings));
+  }
+
+  // ---------- WORKERS DATA (Indian Names & Random Contacts) ----------
+  const workersData = [
+    { id: 1, name: "Arjun Mehta", profession: "cameraman", professionShow: "Cameraman", contact: "+91 98765 43210", city: "Mumbai", icon: "📸" },
+    { id: 2, name: "Rohit Sharma", profession: "cameraman", professionShow: "Cameraman", contact: "+91 99887 66554", city: "Delhi", icon: "📸" },
+    { id: 3, name: "Vikram Singh", profession: "carpainter", professionShow: "Car Painter", contact: "+91 88990 11223", city: "Pune", icon: "🎨" },
+    { id: 4, name: "Suresh Patil", profession: "carpainter", professionShow: "Car Painter", contact: "+91 77450 99881", city: "Bangalore", icon: "🎨" },
+    { id: 5, name: "Ramesh Yadav", profession: "mechanic", professionShow: "Mechanic", contact: "+91 98222 33456", city: "Chennai", icon: "🔧" },
+    { id: 6, name: "Manoj Kumar", profession: "mechanic", professionShow: "Mechanic", contact: "+91 87654 32109", city: "Lucknow", icon: "🔧" },
+    { id: 7, name: "Gurpreet Singh", profession: "welder", professionShow: "Welder", contact: "+91 99881 22345", city: "Amritsar", icon: "⚡" },
+    { id: 8, name: "Jitendra Verma", profession: "welder", professionShow: "Welder", contact: "+91 70123 45678", city: "Indore", icon: "⚡" },
+    { id: 9, name: "Prakash Raj", profession: "electrician", professionShow: "Electrician", contact: "+91 93456 78901", city: "Hyderabad", icon: "💡" },
+    { id: 10, name: "Santosh Gupta", profession: "electrician", professionShow: "Electrician", contact: "+91 99012 34567", city: "Jaipur", icon: "💡" },
+    { id: 11, name: "Dilip Choudhary", profession: "plumber", professionShow: "Plumber", contact: "+91 77654 33210", city: "Ahmedabad", icon: "🚰" },
+    { id: 12, name: "Rajendra Prasad", profession: "plumber", professionShow: "Plumber", contact: "+91 88899 77665", city: "Patna", icon: "🚰" },
+    { id: 13, name: "Kishan Lal", profession: "carpenter", professionShow: "Carpenter", contact: "+91 70234 56789", city: "Bhopal", icon: "🪚" },
+    { id: 14, name: "Harish Garg", profession: "carpenter", professionShow: "Carpenter", contact: "+91 96543 21098", city: "Chandigarh", icon: "🪚" },
+    { id: 15, name: "Sunil Kumar", profession: "mason", professionShow: "Mason", contact: "+91 99123 45670", city: "Lucknow", icon: "🧱" },
+    { id: 16, name: "Ravi Shankar", profession: "mason", professionShow: "Mason", contact: "+91 84567 89012", city: "Ranchi", icon: "🧱" },
+    { id: 17, name: "Ankit Kapoor", profession: "cameraman", professionShow: "Cameraman", contact: "+91 98760 54321", city: "Kolkata", icon: "📸" },
+    { id: 18, name: "Yogesh Joshi", profession: "electrician", professionShow: "Electrician", contact: "+91 90234 56123", city: "Nagpur", icon: "💡" }
+  ];
+
+  let currentFilter = "all";
+
+  // Render Workers Grid
+  function renderWorkers() {
+    let filtered = workersData;
+    if (currentFilter !== "all") {
+      filtered = workersData.filter(w => w.profession === currentFilter);
+    }
+    if (filtered.length === 0) {
+      return `<div style="text-align:center; padding:3rem;">No workers found in this category</div>`;
+    }
+    return `
+      <div class="workers-grid">
+        ${filtered.map(worker => `
+          <div class="worker-card">
+            <div class="card-header">
+              <div class="worker-icon">${worker.icon}</div>
+              <div class="worker-name">${worker.name}</div>
+              <div class="profession-badge">${worker.professionShow}</div>
+            </div>
+            <div class="card-body">
+              <div class="contact-info">
+                <span>📞</span> <span>${worker.contact}</span>
+              </div>
+              <div class="contact-info">
+                <span>📍</span> <span>${worker.city}, India</span>
+              </div>
+              <button class="book-btn" onclick="bookWorker('${worker.name}', '${worker.professionShow}', '${worker.contact}')">
+                📅 Book Now
+              </button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // Home Page
+  function renderHomePage() {
+    return `
+      <div class="hero">
+        <h2>Hire Trusted Local Experts</h2>
+        <p>Cameraman • Car Painter • Mechanic • Welder • Electrician • Plumber • Carpenter • Mason</p>
+        <p style="margin-top:1rem;">✅ Verified Professionals | ✅ Best Prices | ✅ Quick Service</p>
+      </div>
+      
+      ${currentUser ? `
+        <div class="dashboard-panel">
+          <div class="dashboard-header">
+            <h3>👤 My Dashboard</h3>
+            <div class="info-card">⭐ Welcome, ${currentUser.name}</div>
+          </div>
+          <div class="info-cards">
+            <div class="info-card">📞 Mobile: ${currentUser.mobile}</div>
+            <div class="info-card">📅 Member since: ${currentUser.joined || 'Today'}</div>
+            <div class="info-card">🎯 Total Bookings: ${JSON.parse(localStorage.getItem('user_bookings') || '[]').length}</div>
+          </div>
+        </div>
+      ` : ''}
+      
+      <h2 class="section-title">🛠️ Browse Professionals</h2>
+      <div class="filter-buttons">
+        <button class="filter-btn ${currentFilter === 'all' ? 'active' : ''}" onclick="setFilter('all')">All</button>
+        <button class="filter-btn ${currentFilter === 'cameraman' ? 'active' : ''}" onclick="setFilter('cameraman')">📸 Cameraman</button>
+        <button class="filter-btn ${currentFilter === 'carpainter' ? 'active' : ''}" onclick="setFilter('carpainter')">🎨 Car Painter</button>
+        <button class="filter-btn ${currentFilter === 'mechanic' ? 'active' : ''}" onclick="setFilter('mechanic')">🔧 Mechanic</button>
+        <button class="filter-btn ${currentFilter === 'welder' ? 'active' : ''}" onclick="setFilter('welder')">⚡ Welder</button>
+        <button class="filter-btn ${currentFilter === 'electrician' ? 'active' : ''}" onclick="setFilter('electrician')">💡 Electrician</button>
+        <button class="filter-btn ${currentFilter === 'plumber' ? 'active' : ''}" onclick="setFilter('plumber')">🚰 Plumber</button>
+        <button class="filter-btn ${currentFilter === 'carpenter' ? 'active' : ''}" onclick="setFilter('carpenter')">🪚 Carpenter</button>
+        <button class="filter-btn ${currentFilter === 'mason' ? 'active' : ''}" onclick="setFilter('mason')">🧱 Mason</button>
+      </div>
+      ${renderWorkers()}
+    `;
+  }
+
+  // About Page
+  function renderAboutPage() {
+    return `
+      <div class="page-content">
+        <h2>📖 About KaushalSetu</h2>
+        <p style="margin: 1rem 0; font-size: 1.1rem;">KaushalSetu is a platform dedicated to connecting local skilled workers with customers across India. We empower local artisans, mechanics, electricians, and other professionals by providing them a digital presence.</p>
+        <h3 style="margin-top: 1.5rem;">🎯 Our Mission</h3>
+        <p>To bridge the gap between local talent and people who need reliable services. Every worker is verified with authentic Indian contact details.</p>
+        <h3 style="margin-top: 1.5rem;">👥 Professions We Cover</h3>
+        <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+          <li>📸 Cameraman / Photographer</li>
+          <li>🎨 Car Painter & Denting</li>
+          <li>🔧 Auto Mechanic</li>
+          <li>⚡ Welder & Fabricator</li>
+          <li>💡 Electrician</li>
+          <li>🚰 Plumber</li>
+          <li>🪚 Carpenter</li>
+          <li>🧱 Mason / Construction Worker</li>
+        </ul>
+        <p style="margin-top: 1.5rem;"><strong>BCA Final Year Project</strong> - Built with HTML, CSS, JavaScript, and localStorage for user persistence.</p>
+      </div>
+    `;
+  }
+
+  // Contact Page
+  function renderContactPage() {
+    return `
+      <div class="page-content">
+        <h2>📞 Contact Us</h2>
+        <p style="margin: 1rem 0;">Have questions? Reach out to our support team.</p>
+        <div class="contact-info-list">
+          <div class="contact-item"><span style="font-size:1.5rem;">📱</span> <span><strong>Customer Support</strong><br>+91 1800 202 4521 (Toll Free)</span></div>
+          <div class="contact-item"><span style="font-size:1.5rem;">✉️</span> <span><strong>Email</strong><br>support@kaushalsetu.in</span></div>
+          <div class="contact-item"><span style="font-size:1.5rem;">🏢</span> <span><strong>Office Address</strong><br>B-42, Knowledge Park, Greater Noida, UP - 201310</span></div>
+          <div class="contact-item"><span style="font-size:1.5rem;">⏰</span> <span><strong>Working Hours</strong><br>Mon-Sat: 9:00 AM - 7:00 PM</span></div>
+        </div>
+        <div style="background:#e8f3ef; padding:1rem; border-radius:20px; margin-top:1rem;">
+          <p><strong>📢 For Worker Registration:</strong> If you're a skilled worker, call +91 98765 01234 or email worker@kaushalsetu.in</p>
+        </div>
+      </div>
+    `;
+  }
+
+  // My Bookings Page
+  function renderBookingsPage() {
+    const bookings = JSON.parse(localStorage.getItem('user_bookings') || '[]');
+    const userBookings = bookings.filter(b => currentUser ? b.bookedBy === currentUser.name : false);
+    
+    if (!currentUser) {
+      return `
+        <div class="page-content" style="text-align:center;">
+          <h2>📋 My Bookings</h2>
+          <p style="margin: 2rem;">Please login to view your bookings.</p>
+          <button class="submit-btn" style="width:auto; padding:0.5rem 2rem;" onclick="openAuthModal()">Login Now</button>
+        </div>
+      `;
+    }
+    
+    if (userBookings.length === 0) {
+      return `
+        <div class="page-content" style="text-align:center;">
+          <h2>📋 My Bookings</h2>
+          <p style="margin: 2rem;">You haven't booked any worker yet. Browse professionals and click "Book Now"!</p>
+          <button class="submit-btn" style="width:auto; padding:0.5rem 2rem;" onclick="navigateTo('home')">Browse Workers</button>
+        </div>
+      `;
+    }
+    
+    return `
+      <div class="page-content">
+        <h2>📋 My Bookings (${userBookings.length})</h2>
+        <div style="display:flex; flex-direction:column; gap:1rem; margin-top:1.5rem;">
+          ${userBookings.map((booking, idx) => `
+            <div style="background:#f5fbf8; padding:1rem; border-radius:20px;">
+              <p><strong>🔧 ${booking.workerName}</strong> (${booking.profession})</p>
+              <p>📞 Contact: ${booking.contact}</p>
+              <p>📅 Booked on: ${booking.date}</p>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // Navigation State
+  let currentPage = 'home';
+
+  function setFilter(filter) {
+    currentFilter = filter;
+    renderCurrentPage();
+  }
+
+  function navigateTo(page) {
+    currentPage = page;
+    renderCurrentPage();
+  }
+
+  function renderCurrentPage() {
+    const main = document.getElementById('mainContent');
+    let content = '';
+    switch(currentPage) {
+      case 'home':
+        content = renderHomePage();
+        break;
+      case 'about':
+        content = renderAboutPage();
+        break;
+      case 'contact':
+        content = renderContactPage();
+        break;
+      case 'bookings':
+        content = renderBookingsPage();
+        break;
+      default:
+        content = renderHomePage();
+    }
+    main.innerHTML = content;
+    updateNavBar();
+  }
+
+  function updateNavBar() {
+    const navLinks = document.getElementById('navLinks');
+    if (currentUser) {
+      navLinks.innerHTML = `
+        <a href="#" onclick="navigateTo('home'); return false;" class="${currentPage === 'home' ? 'active' : ''}">🏠 Home</a>
+        <a href="#" onclick="navigateTo('about'); return false;" class="${currentPage === 'about' ? 'active' : ''}">📖 About</a>
+        <a href="#" onclick="navigateTo('contact'); return false;" class="${currentPage === 'contact' ? 'active' : ''}">📞 Contact</a>
+        <a href="#" onclick="navigateTo('bookings'); return false;" class="${currentPage === 'bookings' ? 'active' : ''}">📋 My Bookings</a>
+        <div class="user-info">
+          <div class="user-avatar">${currentUser.name.charAt(0).toUpperCase()}</div>
+          <span>${currentUser.name}</span>
+          <button class="logout-btn" onclick="logoutUser()">🚪 Logout</button>
+        </div>
+      `;
+    } else {
+      navLinks.innerHTML = `
+        <a href="#" onclick="navigateTo('home'); return false;" class="${currentPage === 'home' ? 'active' : ''}">🏠 Home</a>
+        <a href="#" onclick="navigateTo('about'); return false;" class="${currentPage === 'about' ? 'active' : ''}">📖 About</a>
+        <a href="#" onclick="navigateTo('contact'); return false;" class="${currentPage === 'contact' ? 'active' : ''}">📞 Contact</a>
+        <a href="#" onclick="openAuthModal(); return false;" class="auth-btn">🔐 Sign In / Register</a>
+      `;
+    }
+  }
+
+  // Auth Modal
+  const authModal = document.getElementById('authModal');
+  const loginDiv = document.getElementById('loginFormDiv');
+  const registerDiv = document.getElementById('registerFormDiv');
+  
+  function openAuthModal() {
+    authModal.style.display = 'flex';
+  }
+  
+  function closeAuthModal() {
+    authModal.style.display = 'none';
+  }
+  
+  document.getElementById('showLoginTab').addEventListener('click', () => {
+    loginDiv.classList.remove('hidden-form');
+    registerDiv.classList.add('hidden-form');
+    document.getElementById('showLoginTab').classList.add('active');
+    document.getElementById('showRegisterTab').classList.remove('active');
+  });
+  
+  document.getElementById('showRegisterTab').addEventListener('click', () => {
+    registerDiv.classList.remove('hidden-form');
+    loginDiv.classList.add('hidden-form');
+    document.getElementById('showRegisterTab').classList.add('active');
+    document.getElementById('showLoginTab').classList.remove('active');
+  });
+  
+  document.getElementById('doLogin').addEventListener('click', () => {
+    const name = document.getElementById('loginName').value;
+    const mobile = document.getElementById('loginMobile').value;
+    if (loginUser(name, mobile)) {
+      closeAuthModal();
+      renderCurrentPage();
+      document.getElementById('loginName').value = '';
+      document.getElementById('loginMobile').value = '';
+    }
+  });
+  
+  document.getElementById('doRegister').addEventListener('click', () => {
+    const name = document.getElementById('regName').value;
+    const mobile = document.getElementById('regMobile').value;
+    if (registerUser(name, mobile)) {
+      closeAuthModal();
+      renderCurrentPage();
+      document.getElementById('regName').value = '';
+      document.getElementById('regMobile').value = '';
+    }
+  });
+  
+  document.getElementById('closeAuthModal').addEventListener('click', closeAuthModal);
+  window.addEventListener('click', (e) => {
+    if (e.target === authModal) closeAuthModal();
+  });
+  
+  // Initialize
+  loadUser();
+  renderCurrentPage();
+</script>
+</body>
+</html>
